@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DepartmentModal from "./components/DepartmentModal";
 
 const Login = () => {
     const [loginInfo, setLoginInfo] = useState({
         username: "",
         password: "",
     });
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleChange = (e) => {
         setLoginInfo({
@@ -17,8 +19,16 @@ const Login = () => {
     const handleSubmit = () => {
         console.log(loginInfo);
         localStorage.setItem("isLoggedIn", true);
-        window.location.reload();
+        handleOpenModal();
     }
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+      };
+    
+      const handleCloseModal = () => {
+        setIsModalOpen(false);
+      };
 
     return (
         <div className="flex items-center justify-center h-screen bg-gray-200">
@@ -44,6 +54,7 @@ const Login = () => {
                     </div>
                 </form>
             </div>
+            {<DepartmentModal isOpen={isModalOpen} onClose={handleCloseModal} />}
         </div>
     );
 }

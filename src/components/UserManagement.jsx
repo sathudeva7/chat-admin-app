@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AddUser from './AddUser';
 
 const users = [
 	{
@@ -22,6 +23,17 @@ const users = [
 ];
 
 const UserManagement = () => {
+	const [openModel, setOpenModel] = useState(false);
+
+	const handleAddUser = () => {
+		setOpenModel(true);
+	   };
+
+	   const handleClose = () => {
+		setOpenModel(false);
+	   };
+	 
+
 	return (
 		<div className="p-8">
 			<div className="pb-4">
@@ -36,7 +48,7 @@ const UserManagement = () => {
 						className="p-2 border rounded"
 					/>
 				</div>
-				<button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+				<button className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleAddUser}>
 					Add User
 				</button>
 			</div>
@@ -77,6 +89,7 @@ const UserManagement = () => {
 					</tbody>
 				</table>
 			</div>
+			{openModel && <AddUser handleClose={handleClose} />}
 		</div>
 	);
 };
