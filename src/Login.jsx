@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DepartmentModal from "./components/DepartmentModal";
+import useAuth from "./hooks/useAuth";
 
 const Login = () => {
     const [loginInfo, setLoginInfo] = useState({
@@ -8,18 +9,29 @@ const Login = () => {
         password: "",
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { currentUser, login, logout, isLoading } = useAuth();
 
     const handleChange = (e) => {
+        e.preventDefault();
         setLoginInfo({
             ...loginInfo,
             [e.target.name]: e.target.value,
         });
     }
 
-    const handleSubmit = () => {
+    const handleSubmit =async () => {
         console.log(loginInfo);
-        localStorage.setItem("isLoggedIn", true);
-        handleOpenModal();
+        try {
+            await login(loginInfo.username, loginInfo.password).then((res) => {
+                console.log(res);
+                if (res.message == "Login successful") {
+                    handleOpenModal();
+                }
+            })
+        } catch (error) {
+            console.error('Login failed:', error);
+          }
+        // handleOpenModal();
     }
 
     const handleOpenModal = () => {

@@ -1,7 +1,18 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import departmentService from "../service/department.service";
 
 const DepartmentModal = ({ isOpen, onClose }) => {
+  const [nameOptions, setNameOptions] = useState([]);
   if (!isOpen) return null;
+
+  useEffect(() => {
+    departmentService.getAllDepartments().then((res) => {
+      console.log(res);
+      if (res.message == "Departments fetched successfully") {
+        setNameOptions(res.data);
+      }
+    })
+  },[])
 
   return (
     <Fragment>
