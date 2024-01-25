@@ -1,11 +1,12 @@
 import AppLayout from '../components/AppLayout'
+import useAuth from '../hooks/useAuth';
 import AppRouter from './AppRouter'
 import AuthRouter from './AuthRouter';
 
 function UserApp() {
-	const isLoggedIn  = localStorage.getItem("isLoggedIn") ? localStorage.getItem("isLoggedIn") : false;
+   const { currentUser, login, logout, isLoading } = useAuth();
 
-	if (!isLoggedIn) {
+	if (!currentUser) {
 		return (
 			<AuthRouter />
 		)

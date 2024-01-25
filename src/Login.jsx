@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DepartmentModal from "./components/DepartmentModal";
 import useAuth from "./hooks/useAuth";
+import userService from "./service/user.service";
 
 const Login = () => {
     const [loginInfo, setLoginInfo] = useState({
@@ -10,6 +11,7 @@ const Login = () => {
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { currentUser, login, logout, isLoading } = useAuth();
+    const [userDepartments, setUserDepartments] = useState([]);
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -22,12 +24,21 @@ const Login = () => {
     const handleSubmit =async () => {
         console.log(loginInfo);
         try {
-            await login(loginInfo.username, loginInfo.password).then((res) => {
+            await login(loginInfo.username, loginInfo.password).then(async(res) => {
                 console.log(res);
-                if (res.message == "Login successful") {
-                    handleOpenModal();
+                if (res.success) {
+                    await userService.getUserById(res.user.id).then((res) => {
+                        console.log(res.user[0]);
+                        if (res.success) {
+                            setUserDepartments(res.user[0].departments);
+                            handleOpenModal();
+                            
+                        }
+                    })
                 }
             })
+
+            
         } catch (error) {
             console.error('Login failed:', error);
           }
@@ -46,6 +57,7 @@ const Login = () => {
         <div className="flex items-center justify-center h-screen bg-gray-200">
             <div className="p-6 bg-white rounded shadow-md">
                 <h2 className="text-lg font-bold mb-4">Login</h2>
+                {console.log(userDepartments)}
                 <form>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
@@ -66,7 +78,7 @@ const Login = () => {
                     </div>
                 </form>
             </div>
-            {<DepartmentModal isOpen={isModalOpen} onClose={handleCloseModal} />}
+            {<DepartmentModal isOpen={isModalOpen} onClose={handleCloseModal} departments={userDepartments}/>}
         </div>
     );
 }

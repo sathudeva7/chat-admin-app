@@ -6,20 +6,21 @@ const authService = {
     // Function to log in a user
     login: async (email, password) => {
         try {
-		await axios.get('http://localhost:3001/api/auth/login', {withCredentials: true}).then((response) => {
-           console.log(response);
-          })
+		const response = await axios.post('http://localhost:3001/api/auth/login',{email,password}, {withCredentials: true})
 		 
-        console.log(response);
             if (!response.data) {
-                throw new Error('Login failed');
+                // Handle HTTP errors
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            return response.data;
+        
+            const data = await response.data;
+            localStorage.setItem('user', JSON.stringify(data.user));
+            console.log(data)
+            return data; // Return the parsed data
         } catch (error) {
-            console.error('Login Error:', error);
-            return errorHandler(error);
+            console.error('There was an error!', error);
         }
+        
     },
 
     // Function to log out a user

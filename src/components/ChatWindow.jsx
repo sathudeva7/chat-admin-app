@@ -1,5 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
+const socket = io.connect("http://localhost:3001", {
+	transports: ["websocket"],
+});
 
+socket.on('connect', () => {
+	console.log(`Connected to server with socket ID: ${socket.id}`);
+ });
+ 
+ socket.on('disconnect', () => {
+	console.log('Disconnected from server');
+ });
+ 
 const ChatWindow = ({ currentUser }) => {
 	const [messages, setMessages] = useState([
 		{
@@ -12,6 +24,26 @@ const ChatWindow = ({ currentUser }) => {
 	]);
 	const [newMessage, setNewMessage] = useState("");
 
+	useEffect(() => {
+		// Existing online status code...
+  
+socket.on('connect', () => {
+	console.log(`Connected to server with socket ID: ${socket.id}`);
+ });
+ 
+ socket.on('disconnect', () => {
+	console.log('Disconnected from server');
+ });
+		// Listening for incoming messages
+		socket.on('receiveMessage', (message) => {
+		    console.log(message)
+		});
+  
+		// return () => {
+		//     socket.off('receiveMessage');
+		// };
+	 }, [socket]);
+
 	const handleSendMessage = () => {
 		if (newMessage.trim()) {
 			const newMessageObj = {
@@ -21,9 +53,20 @@ const ChatWindow = ({ currentUser }) => {
 				senderInitial: "Y"
 			};
 			setMessages([...messages, newMessageObj]);
-			setNewMessage("");
+			setMessages("");
+
+			
 		}
 	};
+
+	const sendMessage = () => {
+  
+		    const message = { user: 'user123', text: messages };
+		    socket.emit('sendMessage', message);
+		    setMessages([...messages, message]);
+		    setMessages('');
+		
+	 };
 
 	return (
 		<div className="flex-1 p-6">
@@ -32,10 +75,10 @@ const ChatWindow = ({ currentUser }) => {
 					<div className="flex items-center space-x-3">
 						<div className="flex-shrink-0">
 							<div className="rounded-full h-10 w-10 flex items-center justify-center bg-blue-500 text-white uppercase">
-								{currentUser.profilePic ? (
+								{currentUser?.profilePic ? (
 									<img
-										src={currentUser.profilePic}
-										alt={currentUser.name}
+										src={currentUser?.profilePic}
+										alt={currentUser?.name}
 										className="rounded-full h-10 w-10 object-cover"
 									/>
 								) : (
@@ -44,21 +87,21 @@ const ChatWindow = ({ currentUser }) => {
 							</div>
 						</div>
 						<div className="flex flex-col">
-							<h2 className="text-xl font-semibold">{currentUser.name}</h2>
+							<h2 className="text-xl font-semibold">{currentUser?.customer.name}</h2>
 							<span
-								className={`text-sm ${currentUser.status === "Active"
+								className={`text-sm ${currentUser?.status === "Active"
 										? "text-green-500"
 										: "text-gray-400"
 									}`}
 							>
-								{currentUser.status}
+								{currentUser?.status}
 							</span>
 						</div>
 					</div>
 				</div>
 
 				<div className="overflow-y-auto mb-4">
-					{messages.map((message, index) => (
+					{/* {messages.map((message, index) => (
 						<div key={index} className={`flex items-start space-x-2 ${message.sender === 'You' ? 'justify-end' : ''}`}>
 							{message.sender !== 'You' && (
 								<div className="rounded-full h-8 w-8 flex items-center justify-center bg-gray-300 text-white text-sm uppercase">
@@ -73,7 +116,7 @@ const ChatWindow = ({ currentUser }) => {
 								<p className="text-xs text-gray-600">{message.timestamp}</p>
 							</div>
 						</div>
-					))}
+					))} */}
 				</div>
 
 
@@ -87,7 +130,7 @@ const ChatWindow = ({ currentUser }) => {
 							className="flex-1 border p-2 rounded mr-2"
 						/>
 						<button
-							onClick={handleSendMessage}
+							onClick={sendMessage}
 							className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 						>
 							Send

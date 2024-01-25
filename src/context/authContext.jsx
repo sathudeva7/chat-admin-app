@@ -10,11 +10,11 @@ const AuthProvider = ({ children }) => {
     // Function to handle login
     const login = async (email, password) => {
         setIsLoading(true);
-	   console.log("ppdsasd")
         try {
-             const user = await authService.login(email, password);
-		   return user;
-          //   setCurrentUser(user);
+             const response = await authService.login(email, password);
+		   
+             setCurrentUser(response.user);
+          return response;
         } catch (error) {
             console.error('Login failed:', error);
             // Optionally handle the error, like showing a notification
