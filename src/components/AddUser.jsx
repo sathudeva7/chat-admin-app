@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 // Reusable input field component
-const InputField = ({ label, value, onChange, id }) => (
+const InputField = ({ label, value, onChange, id, type }) => (
     <div className="mb-4">
         <label htmlFor={id} className="block text-gray-700 text-sm font-bold mb-2">
             {label}:
         </label>
         <input
-            type="text"
+            type={type ? type : "text"}
             id={id}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             value={value}
@@ -17,9 +17,11 @@ const InputField = ({ label, value, onChange, id }) => (
 );
 
 // Form component for adding a user
-const AddUserForm = ({ handleNameChange, handleDepartmentChange, handleSubmit, name, department }) => (
+const AddUserForm = ({ handleNameChange, handleDepartmentChange, handleSubmit, name,email,password, department }) => (
     <form onSubmit={handleSubmit} className="bg-white px-8 pt-6 pb-8 mb-4">
         <InputField label="Name" value={name} onChange={handleNameChange} id="name" />
+        <InputField label="Email" value={email} onChange={handleNameChange} id="email" />
+        <InputField label="Password" value={password} onChange={handleNameChange} id="password" type="password"/>
 	   <label className="block text-gray-700 text-sm font-bold mb-2">Department:</label>
         <select className="w-full border border-gray-300 rounded-md px-3 py-2 mb-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
 			<option>Sales</option>
@@ -38,6 +40,9 @@ const AddUserForm = ({ handleNameChange, handleDepartmentChange, handleSubmit, n
 // Main component to add a user
 const AddUser = ({ handleClose }) => {
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
     const [department, setDepartment] = useState('');
 
     const handleNameChange = (e) => setName(e.target.value);
@@ -59,6 +64,8 @@ const AddUser = ({ handleClose }) => {
                     handleDepartmentChange={handleDepartmentChange}
                     handleSubmit={handleSubmit}
                     name={name}
+                    email={email}
+                    password={password}
                     department={department}
                 />
             </div>

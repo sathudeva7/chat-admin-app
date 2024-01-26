@@ -34,6 +34,23 @@ const chatService = {
 			return errorHandler(error);
 		}
 
+	},
+
+	getMessagesByChat: async (chatId) => {
+		
+		try {
+			const response = await axios.get(`http://localhost:3001/api/chats/messages/${chatId}` ,{ withCredentials: true });
+			console.log(response);
+			if (!response.data) {
+				throw new Error('Login failed');
+			}
+
+			return response.data;
+		} catch (error) {
+			console.error('Login Error:', error);
+			return errorHandler(error);
+		}
+
 	}
 
 

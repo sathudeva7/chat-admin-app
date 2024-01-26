@@ -1,38 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AddUser from './AddUser';
-
-const users = [
-	{
-		id: '#876364',
-		name: 'Maxi Smith',
-		department: 'Sales',
-		email: 'maxismith@gmail.com',
-		joinedDate: '12 Dec, 2020',
-		proposals: 10,
-		avatar: 'https://t3.ftcdn.net/jpg/05/53/79/60/360_F_553796090_XHrE6R9jwmBJUMo9HKl41hyHJ5gqt9oz.jpg', // Replace with actual image path
-	},
-	{
-		id: '#876364',
-		name: 'Robert William',
-		department: 'Technical',
-		email: 'robert112@gmail.com',
-		joinedDate: '12 Dec, 2020',
-		proposals: 5,
-		avatar: 'https://t3.ftcdn.net/jpg/05/53/79/60/360_F_553796090_XHrE6R9jwmBJUMo9HKl41hyHJ5gqt9oz.jpg', // Replace with actual image path
-	},
-];
+import userService from '../service/user.service';
+import { useNavigate } from 'react-router-dom';
 
 const UserManagement = () => {
+	const [users, setUsers] = useState([]);
 	const [openModel, setOpenModel] = useState(false);
+	const naigate = useNavigate();
 
 	const handleAddUser = () => {
 		setOpenModel(true);
-	   };
+	};
 
-	   const handleClose = () => {
+	const handleClose = () => {
 		setOpenModel(false);
-	   };
-	 
+	};
+
+	useEffect(() => {
+		userService.getAllUsers().then((res) => {
+			console.log(res);
+			setUsers(res.users);
+		})
+
+	}, [])
+
 
 	return (
 		<div className="p-8">
@@ -66,23 +57,19 @@ const UserManagement = () => {
 						{users.map((user) => (
 							<tr key={user.id} className="hover:bg-grey-lighter">
 								<td className="py-4 px-6 border-b border-grey-light flex items-center">
-									<img className="h-8 w-8 rounded-full mr-2" src={user.avatar} alt={user.name} />
-									{user.name}
+									<img className="h-8 w-8 rounded-full mr-2" src='https://t3.ftcdn.net/jpg/05/53/79/60/360_F_553796090_XHrE6R9jwmBJUMo9HKl41hyHJ5gqt9oz.jpg' alt={user.username} />
+									{user.username}
 								</td>
-								<td className="py-4px-6 border-b border-grey-light">{user.department}</td>
 								<td className="py-4 px-6 border-b border-grey-light">
-									View
-									<div className="flex justify-end items-center">
-										<button className="text-blue-500 hover:text-blue-600 mx-1">
-											<i className="fas fa-edit"></i>
-										</button>
-										<button className="text-blue-500 hover:text-blue-600 mx-1">
-											<i className="fas fa-eye"></i>
-										</button>
-										<button className="text-red-500 hover:text-red-600 mx-1">
-											<i className="fas fa-trash"></i>
-										</button>
-									</div>
+									{user.departments.map((department, index) => (
+										<div key={index}>{department.name}</div>
+									))}
+								</td>
+								<td className="py-4 px-6 border-b border-grey-light">
+									
+									<button className="text-blue-500 hover:text-blue-600 mx-1" onClick={() => naigate(`/`)}>
+											<i className="fas fa-eye"></i>View
+									</button>
 								</td>
 							</tr>
 						))}

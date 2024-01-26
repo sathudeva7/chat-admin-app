@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
-const socket = io.connect("http://localhost:3001", {
-	transports: ["websocket"],
-});
+import useAuth from "../hooks/useAuth";
+import chatService from "../service/chat.service";
+import LetterAvatar from "./LetterAvatar";
 
-socket.on('connect', () => {
-	console.log(`Connected to server with socket ID: ${socket.id}`);
- });
- 
- socket.on('disconnect', () => {
-	console.log('Disconnected from server');
- });
- 
-const ChatWindow = ({ currentUser }) => {
+
+const ChatWindow = ({ userSelected }) => {
+	const { currentUser } = useAuth();
 	const [messages, setMessages] = useState([
 		{
 			sender: "You",
@@ -24,99 +18,114 @@ const ChatWindow = ({ currentUser }) => {
 	]);
 	const [newMessage, setNewMessage] = useState("");
 
+	const [socket, setSocket] = useState(null);
+
 	useEffect(() => {
-		// Existing online status code...
-  
-socket.on('connect', () => {
-	console.log(`Connected to server with socket ID: ${socket.id}`);
- });
- 
- socket.on('disconnect', () => {
-	console.log('Disconnected from server');
- });
-		// Listening for incoming messages
-		socket.on('receiveMessage', (message) => {
-		    console.log(message)
-		});
-  
-		// return () => {
-		//     socket.off('receiveMessage');
-		// };
-	 }, [socket]);
+		if (userSelected) {
+			// Initialize socket connection when a user is selected
+			const newSocket = io.connect("http://localhost:3001", {
+				transports: ["websocket"],
+				query: { chat_id: userSelected.id }
+			});
+
+			newSocket.on('connect', () => {
+				console.log(`Connected to server with socket ID: ${newSocket.id}`);
+			});
+
+			newSocket.on('disconnect', () => {
+				console.log('Disconnected from server');
+			});
+
+			newSocket.on('receiveMessage', (message) => {
+				setMessages(prevMessages => [...prevMessages, message]);
+			});
+
+			setSocket(newSocket);
+
+			// Cleanup on component unmount
+			return () => {
+				newSocket.disconnect();
+			};
+		}
+	}, [userSelected]);
+
+	useEffect(() => {
+		if (userSelected) {
+			chatService.getMessagesByChat(userSelected?.id).then((res) => {
+				console.log(res);
+				setMessages(res.messages);
+
+			})
+		}
+	}, [userSelected])
 
 	const handleSendMessage = () => {
 		if (newMessage.trim()) {
-			const newMessageObj = {
-				sender: "",
-				text: newMessage,
-				timestamp: "just now",
-				senderInitial: "Y"
-			};
-			setMessages([...messages, newMessageObj]);
-			setMessages("");
 
-			
+			const messageObj = { from_customer: false, message_text: newMessage, chat_id: userSelected.id };
+			// setMessages([...messages, messageObj]);
+			socket.emit('sendMessage', messageObj);
+			// setMessages("");
+
 		}
 	};
 
-	const sendMessage = () => {
-  
-		    const message = { user: 'user123', text: messages };
-		    socket.emit('sendMessage', message);
-		    setMessages([...messages, message]);
-		    setMessages('');
-		
-	 };
+	function convertTimestamp(timestamp) {
+		const date = new Date(timestamp);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+		const day = String(date.getDate()).padStart(2, '0');
+		const hour = String(date.getHours()).padStart(2, '0');
+		const minute = String(date.getMinutes()).padStart(2, '0');
+
+		return `${year}:${month}:${day} ${hour}:${minute}`;
+	}
 
 	return (
 		<div className="flex-1 p-6">
+			{userSelected &&
 			<div className="flex flex-col h-full">
 				<div className="flex items-center justify-between p-3 border-b-2">
 					<div className="flex items-center space-x-3">
 						<div className="flex-shrink-0">
+							{console.log("asdasd", userSelected)}
 							<div className="rounded-full h-10 w-10 flex items-center justify-center bg-blue-500 text-white uppercase">
-								{currentUser?.profilePic ? (
-									<img
-										src={currentUser?.profilePic}
-										alt={currentUser?.name}
-										className="rounded-full h-10 w-10 object-cover"
-									/>
-								) : (
-									"M"
-								)}
+
+									<LetterAvatar name={userSelected?.customer?.name} />
+
 							</div>
 						</div>
 						<div className="flex flex-col">
-							<h2 className="text-xl font-semibold">{currentUser?.customer.name}</h2>
+							<h2 className="text-xl font-semibold">{userSelected?.customer.name}</h2>
 							<span
-								className={`text-sm ${currentUser?.status === "Active"
-										? "text-green-500"
-										: "text-gray-400"
+								className={`text-sm ${userSelected?.status === "Active"
+									? "text-green-500"
+									: "text-gray-400"
 									}`}
 							>
-								{currentUser?.status}
+								{userSelected?.status}
 							</span>
 						</div>
 					</div>
 				</div>
 
 				<div className="overflow-y-auto mb-4">
-					{/* {messages.map((message, index) => (
-						<div key={index} className={`flex items-start space-x-2 ${message.sender === 'You' ? 'justify-end' : ''}`}>
-							{message.sender !== 'You' && (
+					{messages.map((message, index) => (
+						<div key={index} className={`flex items-start space-x-2 ${message.from_customer === true ? 'justify-end' : ''}`}>
+							{message.from_customer !== true && (
 								<div className="rounded-full h-8 w-8 flex items-center justify-center bg-gray-300 text-white text-sm uppercase">
 									{message.senderInitial}
 								</div>
 							)}
-							<div className={`flex flex-col ${message.sender === 'You' ? 'items-end' : 'items-start'}`}>
-								{message.sender !== 'You' && <p className="text-xs font-semibold">{message.sender}</p>}
-								<div className={`p-3 rounded-lg ${message.sender === 'You' ? 'bg-blue-100' : 'bg-gray-200'}`}>
-									<p>{message.text}</p>
+							<div className={`flex flex-col ${message.from_customer === true ? 'items-end' : 'items-start'}`}>
+								{message.from_customer !== true && <p className="text-xs font-semibold">{message.sender}</p>}
+								<div className={`p-3 rounded-lg ${message.from_customer === true ? 'bg-blue-100' : 'bg-gray-200'}`}>
+									<p>{message.message_text}</p>
 								</div>
-								<p className="text-xs text-gray-600">{message.timestamp}</p>
+								<p className="text-xs text-gray-600">{convertTimestamp(message.created_at)}</p>
 							</div>
 						</div>
-					))} */}
+					))}
 				</div>
 
 
@@ -130,7 +139,7 @@ socket.on('connect', () => {
 							className="flex-1 border p-2 rounded mr-2"
 						/>
 						<button
-							onClick={sendMessage}
+							onClick={handleSendMessage}
 							className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 						>
 							Send
@@ -138,6 +147,7 @@ socket.on('connect', () => {
 					</div>
 				</div>
 			</div>
+               }
 		</div>
 	);
 };

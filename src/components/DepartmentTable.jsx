@@ -13,6 +13,7 @@ const DepartmentTable = ({departmentData}) => {
 	const navigate = useNavigate();
 
   const chooseDept = (deptId) => {
+    console.log(deptId)
     selectDepartment(deptId);
     navigate(`/chat/${deptId}`)
   }
