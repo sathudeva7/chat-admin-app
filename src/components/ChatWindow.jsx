@@ -62,11 +62,11 @@ const ChatWindow = ({ userSelected }) => {
 	const handleSendMessage = () => {
 		if (newMessage.trim()) {
 
-			const messageObj = { from_customer: false, message_text: newMessage, chat_id: userSelected.id };
+			const messageObj = { from_customer: false, message_text: newMessage, chat_id: userSelected.id, created_at: new Date()};
 			// setMessages([...messages, messageObj]);
 			socket.emit('sendMessage', messageObj);
-			// setMessages("");
 
+               setNewMessage("");
 		}
 	};
 
@@ -106,6 +106,9 @@ const ChatWindow = ({ userSelected }) => {
 								{userSelected?.status}
 							</span>
 						</div>
+						<div>
+								<button className="border border-red">Tranfer Chat</button>
+							</div>	
 					</div>
 				</div>
 

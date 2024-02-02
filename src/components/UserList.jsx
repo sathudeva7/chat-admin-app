@@ -22,8 +22,6 @@ const UserList = ({dept_id}) => {
     })
   }
 
-
-
   return (
     <div className="bg-white w-80 p-6">
       <div className="flex flex-col">

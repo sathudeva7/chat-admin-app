@@ -27,7 +27,10 @@ const DepartmentTable = ({departmentData}) => {
               Name
             </th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Message Count
+              UnRead Messages
+            </th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              onProg Messages
             </th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -38,7 +41,8 @@ const DepartmentTable = ({departmentData}) => {
           {departmentData?.map((dept) => (
             <tr key={dept.id}>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{dept.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">11</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{dept?.initChatCount}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{dept?.inprogChatCount}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <button className="text-indigo-600 hover:text-indigo-900" onClick={() =>chooseDept(dept.id)}>
                   View
