@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const Header = () => {
+  const { currentUser } = useAuth();
 	const navigate = useNavigate();
 
   const logout = () => {
@@ -13,9 +15,11 @@ const Header = () => {
       <h1 className="text-xl font-bold">ChatApp</h1>
       <div className="flex items-center">
         {/* Placeholder for settings or additional options */}
+        {currentUser?.role == "admin" &&
         <button className="p-2 w-12 h-12 rounded-full hover:bg-blue-600 flex items-center justify-center" onClick={() => navigate("/user")}>
           <img src="/settings.svg" alt="Settings" className="w-6 h-6" />
         </button>
+        }
         <button className="p-2 w-12 h-12 rounded-full hover:bg-blue-600 flex items-center justify-center">
           <div className="w-8 h-8 rounded-full bg-red-300 flex items-center justify-center text-black" onClick={() => logout()}>
             A

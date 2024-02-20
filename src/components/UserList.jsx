@@ -11,7 +11,7 @@ const UserList = ({dept_id}) => {
 
   useEffect(() => {
    //api
-    chatService.getAllChatsByDepartment(dept_id).then((res) => {
+    chatService.getAllChatsByDepartment(dept_id,currentUser?.id ).then((res) => {
       setUsers(res.chats);
     }) 
   },[])

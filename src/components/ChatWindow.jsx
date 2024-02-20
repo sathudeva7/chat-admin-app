@@ -17,6 +17,7 @@ const ChatWindow = ({ userSelected }) => {
 		// Add more messages as needed
 	]);
 	const [newMessage, setNewMessage] = useState("");
+	const [isOnline, setIsOnline] = useState(false);
 
 	const [socket, setSocket] = useState(null);
 
@@ -40,6 +41,10 @@ const ChatWindow = ({ userSelected }) => {
 				setMessages(prevMessages => [...prevMessages, message]);
 			});
 
+			newSocket.on('receiveOnline', (data) => {
+			   setIsOnline(data.isOnline);
+			});
+
 			setSocket(newSocket);
 
 			// Cleanup on component unmount
@@ -48,6 +53,28 @@ const ChatWindow = ({ userSelected }) => {
 			};
 		}
 	}, [userSelected]);
+
+	useEffect(() => {
+		const handleVisibilityChange = () => {
+		  const currentPageIsActive = !document.hidden;;
+		  console.log('Page is now', currentPageIsActive ? 'focused' : 'unfocused');
+	   
+		  // Since currentPageIsActive reflects the new state, the condition was updated accordingly
+		  if (currentPageIsActive) {
+		    console.log('Page is focused');
+		    socket?.emit('isAgentOnline', {"isAgentOnline": true}); // Assuming you want to emit true when page is focused
+		  } else {
+		    console.log('Page is unfocused');
+		    socket?.emit('isAgentOnline', {"isAgentOnline": false});
+		  }
+		};
+		
+		// Add event listener
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+		
+		// Remove event listener on cleanup
+		return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+	   }, [socket]);
 
 	useEffect(() => {
 		if (userSelected) {
@@ -88,7 +115,6 @@ const ChatWindow = ({ userSelected }) => {
 				<div className="flex items-center justify-between p-3 border-b-2">
 					<div className="flex items-center space-x-3">
 						<div className="flex-shrink-0">
-							{console.log("asdasd", userSelected)}
 							<div className="rounded-full h-10 w-10 flex items-center justify-center bg-blue-500 text-white uppercase">
 
 									<LetterAvatar name={userSelected?.customer?.name} />
@@ -98,12 +124,12 @@ const ChatWindow = ({ userSelected }) => {
 						<div className="flex flex-col">
 							<h2 className="text-xl font-semibold">{userSelected?.customer.name}</h2>
 							<span
-								className={`text-sm ${userSelected?.status === "Active"
+								className={`text-sm ${isOnline
 									? "text-green-500"
 									: "text-gray-400"
 									}`}
 							>
-								{userSelected?.status}
+								{isOnline ? "Online" : "Offline"}
 							</span>
 						</div>
 						<div>

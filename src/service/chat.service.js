@@ -4,9 +4,9 @@ import { errorHandler } from "../utils/errorHandler";
 
 const chatService = {
 
-	getAllChatsByDepartment: async (deptId) => {
+	getAllChatsByDepartment: async (deptId, userId) => {
 		try {
-			const response = await axios.get(`http://localhost:3001/api/chats/department/${deptId}` ,{ withCredentials: true });
+			const response = await axios.get(`http://localhost:3001/api/chats/department/${deptId}/${userId}` ,{ withCredentials: true });
 			console.log(response);
 			if (!response.data) {
 				throw new Error('Login failed');

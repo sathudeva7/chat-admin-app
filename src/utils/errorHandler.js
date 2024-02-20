@@ -18,11 +18,11 @@ export const errorHandler = (error) => {
       description: errorText,
     });
 
-    // if (status == 401) {
-    //   localStorage.removeItem("token");
-    //   localStorage.removeItem("user");
-    //   window.location.assign("/");
-    // }
+    if (status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.assign("/");
+    }
     return response.data;
   } else {
     notification.config({
