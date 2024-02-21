@@ -97,6 +97,15 @@ const ChatWindow = ({ userSelected }) => {
 		}
 	};
 
+	const exportChat = () => {
+		const email = {
+			"email": currentUser.email
+		}
+	    chatService.exportChat(userSelected.id, email).then((res) => {
+			console.log(res);
+	    });
+	}
+
 	function convertTimestamp(timestamp) {
 		const date = new Date(timestamp);
 		const year = date.getFullYear();
@@ -133,7 +142,8 @@ const ChatWindow = ({ userSelected }) => {
 							</span>
 						</div>
 						<div>
-								<button className="border border-red">Tranfer Chat</button>
+								<button className="border border-red">Transfer Chat</button>
+								<button className="border border-red" onClick={() => exportChat()}>Export Chat</button>
 							</div>	
 					</div>
 				</div>

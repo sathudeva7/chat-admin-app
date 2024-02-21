@@ -51,7 +51,22 @@ const chatService = {
 			return errorHandler(error);
 		}
 
-	}
+	},
+
+	exportChat : async (chatId, email) => {
+		try {
+			const response = await axios.post(`http://localhost:3001/api/chats/history/${chatId}` , email,{ withCredentials: true });
+			console.log(response);
+			if (!response.data) {
+				throw new Error('Login failed');
+			}
+
+			return response.data;
+		} catch (error) {
+			console.error('Login Error:', error);
+			return errorHandler(error);
+		}
+	},
 
 
 
